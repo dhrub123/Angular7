@@ -1,16 +1,20 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
+import { ProductImplementation } from "./productimplementation";
 
 @Component({
     selector:'pm-products',
-    templateUrl:'./product-list.component.html'
+    templateUrl:'./product-list.component.html',
+    styleUrls:['./product-list.component.css']
 })
-export class ProductListComponent{
-    listFilter: string = 'cart';
+export class ProductListComponent implements OnInit{
+
+    private _listFilter: string;
     pageTitle: string = 'Product List';
     imageWidth: number = 50;
     imageMargin: number = 2;
     showImage: boolean = false;
-    products: any[] = [
+    filteredProducts: ProductImplementation[];
+    products: ProductImplementation[] = [
         {
             "productId": 1,
             "productName": "Leaf Rake",
@@ -34,5 +38,36 @@ export class ProductListComponent{
     ];
     toggleImage(): void {
         this.showImage = !this.showImage;
+    }
+
+    ngOnInit(): void{
+        console.log('Initialize Application');
+        this.listFilter = 'Rake';
+        console.log('Filter String set to Rake');
+    }
+
+    public get listFilter(): string  {
+		return this._listFilter;
+	}
+
+    public set listFilter(value: string ) {
+        this._listFilter = value;
+        this.filteredProducts = value ? this.performFilter(value) : this.products; 
+    }
+    
+    performFilter(filterBy: string ): ProductImplementation[]{
+        filterBy = filterBy.toLocaleLowerCase();
+        return this.products.filter((product:ProductImplementation) =>
+            product.productName.toLocaleLowerCase().indexOf(filterBy)!== -1);
+    }
+
+    constructor(){
+        this._listFilter = 'cart';
+        this.filteredProducts = this.products;
+    }
+
+    onRatingClicked(message:String):void{
+        this.pageTitle = 'Product List: ' + message;
+        console.log(message);
     }
 }
